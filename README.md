@@ -1,253 +1,334 @@
-<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Unimed Kids - Notícias ES & Unimed</title>
+    <title>Lista de Mercado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { 
-            --verde-unimed: #006544; 
-            --verde-fundo-claro: #28a745; 
-            --verde-brilhante: #99cc33; 
-            --azul-kids: #00aeef; 
-            --fundo: #f0f2f5;
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --cancel: #475569;
         }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--fundo); font-family: 'Ubuntu', sans-serif;
-            overflow: hidden;
-        }
-
-        .painel-principal {
-            height: 100vh; width: 100vw;
-            display: grid;
-            grid-template-rows: 150px 1fr 130px;
-            grid-template-columns: 420px 1fr;
-            grid-template-areas: "topo topo" "lateral video" "rodape rodape";
-            gap: 20px; padding: 20px; box-sizing: border-box;
-        }
-
-        .bloco {
-            background: white; border-radius: 45px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden; border: 5px solid white;
-        }
-
-        header { 
-            grid-area: topo; display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            background: white; position: relative;
-        }
-
-        .area-pasta { position: absolute; left: 25px; top: 15px; }
-        .icone-pasta { font-size: 1.5rem; cursor: pointer; opacity: 0.4; transition: 0.3s; }
-        .icone-pasta:hover { opacity: 1; }
-        #input-video { display: none; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; padding: 20px; box-sizing: border-box; position: relative; min-height: 100vh; }
         
-        /* TEMPERATURA COMPACTA */
-        .temp-box-topo { 
-            position: absolute; right: 40px; top: 15px; 
-            text-align: right; display: flex; flex-direction: column; align-items: flex-end;
-        }
-        .temp-localidade { font-size: 0.85rem; font-weight: 800; color: var(--azul-kids); text-transform: uppercase; margin-bottom: -4px; }
-        .temp-info-container { display: flex; align-items: center; gap: 6px; }
-        .temp-icone { font-size: 1.8rem; }
-        .temp-valor { font-size: 2.2rem; font-weight: 900; color: var(--verde-unimed); line-height: 1; }
+        #tela-login, #tela-escolha, #tela-historico { display: flex; flex-direction: column; align-items: center; min-height: 80vh; text-align: center; }
+        #app-principal, #tela-escolha, #tela-historico { display: none; }
 
-        .logo { font-size: 45px; font-weight: 800; color: var(--verde-unimed); margin-top: 5px; }
-        .logo span { color: var(--azul-kids); }
+        .btn-principal { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; margin-bottom: 12px; cursor: pointer; font-size: 1rem; }
         
-        .barra-financeira {
-            background: #1a1a1a; width: 100%; padding: 10px 0;
-            display: flex; justify-content: center; gap: 60px;
-            font-weight: bold; font-size: 1.1rem; color: #fff; margin-top: 10px;
-        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
 
-        .lateral { grid-area: lateral; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
-        #titulo-ad { color: var(--azul-kids); font-size: 2.5rem; margin-bottom: 20px; font-weight: 900; transition: 0.5s; }
-        #desc-ad { font-size: 1.5rem; color: #444; font-weight: 500; transition: 0.5s; }
-
-        .video-box { grid-area: video; background: #000; }
-        video { width: 100%; height: 100%; object-fit: contain; }
-
-        /* RODAPÉ MISTO ES + UNIMED */
-        footer { 
-            grid-area: rodape; background: var(--verde-fundo-claro); 
-            display: flex; align-items: center; border: 5px solid white; border-radius: 45px; 
+        input { 
+            background: var(--card); border: 1px solid #475569; padding: 15px; border-radius: 12px; 
+            color: white; width: 100%; box-sizing: border-box; font-size: 16px; outline: none; 
+            margin-bottom: 10px; text-align: center;
         }
-        .relogio-box { 
-            height: 100%; min-width: 300px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            border-right: 4px solid rgba(255,255,255,0.3); color: white; 
-        }
-        #txt-hora { font-size: 3.8rem; font-weight: 900; line-height: 1; }
-        #txt-data { font-size: 1.2rem; font-weight: bold; }
+        
+        .painel-mensal { background: linear-gradient(135deg, #1e293b, #334155); width: 100%; padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--primary); box-sizing: border-box; }
+        .mes-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #475569; }
 
-        .letreiro-container { flex: 1; overflow: hidden; white-space: nowrap; display: flex; align-items: center; }
-        .letreiro-texto { 
-            display: inline-block; font-size: 2.1rem; font-weight: 800; 
-            color: #ffffff; padding-left: 100%; 
-            animation: scroll-news 100s linear infinite;
+        .grid-cat { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .btn-cat { padding: 12px; border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
+        .cat-1 { background: #ef4444; } .cat-2 { background: #3b82f6; } 
+        .cat-3 { background: #f59e0b; } .cat-4 { background: #10b981; }
+        .cat-5 { background: #8b5cf6; } .cat-6 { background: #ec4899; }
+        .cat-7 { background: #06b6d4; } .cat-8 { background: #f97316; }
+
+        .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px 15px; border-radius: 15px; margin-bottom: 8px; border-left: 5px solid var(--primary); }
+        .btn-check { background: var(--primary); border: none; color: white; padding: 8px 12px; border-radius: 10px; font-weight: bold; }
+        .item-carrinho { border-left-color: var(--accent); background: #064e3b; }
+        
+        #overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index: 1000; align-items:center; justify-content:center; }
+        .modal { background: var(--card); width: 85%; padding: 25px; border-radius: 25px; border: 1px solid #475569; }
+
+        .btn-cancelar { background: var(--cancel); color: #cbd5e1; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+        .btn-perigo { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+        
+        .footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; padding: 20px; border-top: 2px solid var(--primary); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        
+        .hist-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; width: 100%; border-left: 3px solid #64748b; text-align: left; box-sizing: border-box; }
+        
+        .search-box { background: #0f172a; border: 1px solid var(--primary); border-radius: 10px; padding: 8px; color: white; width: 100%; margin-bottom: 15px; font-size: 0.9rem; text-align: left; }
+        
+        .header-categoria { font-size: 0.75rem; font-weight: bold; color: #94a3b8; text-align: left; margin: 15px 0 5px 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ESTILO DO CRÉDITO */
+        .creditos { 
+            font-size: 0.7rem; 
+            color: #64748b; 
+            margin-top: 30px; 
+            font-weight: bold; 
+            letter-spacing: 1px;
+            opacity: 0.8;
         }
-        @keyframes scroll-news { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
-<body onclick="liberarSom()">
+<body>
 
-<div class="painel-principal">
-    <header class="bloco">
-        <div class="area-pasta">
-            <label for="input-video" class="icone-pasta">📂</label>
-            <input type="file" id="input-video" accept="video/*" multiple>
+<div class="container">
+    <div id="tela-login">
+        <div style="font-size: 50px; margin-top: 50px;">🛒</div>
+        <h1 style="margin-bottom: 30px; color: var(--primary);">Lista de Mercado</h1>
+        <button class="btn-principal" onclick="mostrarEscolha()">ABRIR LISTAS</button>
+        <button class="btn-principal" style="background:var(--accent)" onclick="mostrarHistorico()">GASTOS MENSAIS</button>
+        <div class="creditos">Desenvolvido por WLaurenco</div>
+    </div>
+
+    <div id="tela-escolha">
+        <h2 style="margin-top: 50px;">Quem vai usar?</h2>
+        <button class="btn-principal" style="background:#3b82f6" onclick="abrirLista('Marido')">LISTA DO MARIDO</button>
+        <button class="btn-principal" style="background:#ec4899" onclick="abrirLista('Esposa')">LISTA DA ESPOSA</button>
+        <button class="btn-principal" style="background:#10b981" onclick="abrirLista('Filho')">LISTA DO FILHO</button>
+        <button class="btn-cancelar" style="width:100%" onclick="voltarInicio()">VOLTAR</button>
+        <div class="creditos">Desenvolvido por WLaurenco</div>
+    </div>
+
+    <div id="tela-historico" style="padding-top: 20px;">
+        <h2>Histórico de Gastos</h2>
+        <div class="painel-mensal" id="painel-mensal"></div>
+        <button class="btn-principal" style="background:#25d366; font-size:0.8rem" onclick="compartilharZap()">ENVIAR RESUMO POR WHATSAPP</button>
+        <div id="cont-hist" style="width:100%"></div>
+        <button class="btn-perigo" style="margin-top:20px" onclick="zerarGastosMensais()">ZERAR GASTOS (INÍCIO DE ANO)</button>
+        <button class="btn-cancelar" style="margin-top:10px" onclick="voltarInicio()">VOLTAR AO INÍCIO</button>
+        <div class="creditos">Desenvolvido por WLaurenco</div>
+    </div>
+
+    <div id="app-principal" style="padding-top: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+            <span id="titulo-lista" style="font-weight:900; color:var(--primary)">LISTA</span>
+            <button onclick="voltarInicio()" style="background:none; border:none; color:#64748b; font-weight:bold">SAIR</button>
         </div>
-        <div class="logo">Unimed <span>Kids</span></div>
-        <div class="temp-box-topo">
-            <div class="temp-localidade">Vitória, ES</div>
-            <div class="temp-info-container">
-                <span id="clima-icone" class="temp-icone">☀️</span>
-                <span class="temp-valor" id="temp-display">--°C</span>
+
+        <input type="text" id="inputNome" placeholder="O que comprar?">
+        
+        <div class="grid-cat">
+            <button class="btn-cat cat-1" onclick="addItem('Açougue')">🥩 Açougue</button>
+            <button class="btn-cat cat-2" onclick="addItem('Alimentos')">🍚 Alimentos</button>
+            <button class="btn-cat cat-3" onclick="addItem('Limpeza')">🧹 Limpeza</button>
+            <button class="btn-cat cat-4" onclick="addItem('Frutas')">🍎 Frutas</button>
+            <button class="btn-cat cat-5" onclick="addItem('Padaria')">🥖 Padaria</button>
+            <button class="btn-cat cat-6" onclick="addItem('Higiene')">🧴 Higiene</button>
+            <button class="btn-cat cat-7" onclick="addItem('Bebidas')">🥤 Bebidas</button>
+            <button class="btn-cat cat-8" onclick="addItem('Hortifrúti')">🥦 Hortifrúti</button>
+        </div>
+
+        <input type="text" class="search-box" id="searchItem" placeholder="🔍 Buscar na lista..." onkeyup="render()">
+
+        <div id="lista-pendentes"></div>
+        <div style="color:var(--accent); font-weight:900; margin: 30px 0 10px; text-align: left;">🛒 NO CARRINHO</div>
+        <div id="lista-carrinho"></div>
+        
+        <button class="btn-perigo" style="margin-top: 40px;" onclick="limparListaAtiva()">LIMPAR ESTA LISTA</button>
+        <div class="creditos" style="text-align:center">Desenvolvido por WLaurenco</div>
+    </div>
+</div>
+
+<div class="footer" id="footer-app" style="display:none">
+    <div>
+        <small style="font-weight:bold; opacity:0.7">TOTAL</small>
+        <div id="v-total" style="font-size:1.6rem; font-weight:900">R$ 0,00</div>
+    </div>
+    <button class="btn-principal" style="width:auto; background:var(--accent); margin:0; padding:10px 20px" onclick="finalizarCompra()">FINALIZAR</button>
+</div>
+
+<div id="overlay">
+    <div class="modal">
+        <h2 id="m-nome">Item</h2>
+        <div style="display:flex; gap:10px">
+            <div style="flex:1">
+                <label style="font-size:0.7rem; display:block">QTD (Padrão: 1)</label>
+                <input type="number" id="m-qtd" inputmode="numeric" placeholder="1">
+            </div>
+            <div style="flex:2">
+                <label style="font-size:0.7rem; display:block">PREÇO UNIT.</label>
+                <input type="number" id="m-preco" inputmode="decimal">
             </div>
         </div>
-        <div class="barra-financeira">
-            <div class="moeda-item">DÓLAR: <span id="usd">...</span></div>
-            <div class="moeda-item">EURO: <span id="eur">...</span></div>
-            <div class="moeda-item">BITCOIN: <span id="btc" style="color: #f7931a">...</span></div>
-            <div class="moeda-item">IBOVESPA: <span style="color: #00ff00;">+1.2%</span></div>
-        </div>
-    </header>
-
-    <aside class="lateral bloco">
-        <h2 id="titulo-ad">Giro ES</h2>
-        <p id="desc-ad">Carregando notícias e avisos Unimed Vitória...</p>
-    </aside>
-
-    <main class="video-box bloco">
-        <video id="video-player" autoplay></video>
-    </main>
-
-    <footer>
-        <div class="relogio-box">
-            <div id="txt-hora">00:00</div>
-            <div id="txt-data">--/--/--</div>
-        </div>
-        <div class="letreiro-container">
-            <div class="letreiro-texto" id="news-bar">INFORMAÇÕES: [ES] JORNAIS DO ESTADO & [UNIMED] VITÓRIA ••• CARREGANDO...</div>
-        </div>
-    </footer>
+        <button class="btn-principal" style="margin-top:20px; margin-bottom: 0;" onclick="confirmarPeguei()">CONFIRMAR</button>
+        <button class="btn-cancelar" style="width:100%" onclick="fecharModal()">CANCELAR</button>
+    </div>
 </div>
 
 <script>
-    const player = document.getElementById('video-player');
-    const inputVideo = document.getElementById('input-video');
-    let listaDeVideos = [];
-    let videoAtual = -1;
-    let somAtivado = false;
-
-    function liberarSom() {
-        if (!somAtivado) {
-            player.muted = false;
-            player.volume = 1.0;
-            somAtivado = true;
-        }
-    }
-
-    inputVideo.addEventListener('change', (e) => {
-        listaDeVideos = Array.from(e.target.files);
-        if (listaDeVideos.length > 0) tocarProximo();
-    });
-
-    function tocarProximo() {
-        if (listaDeVideos.length === 0) return;
-        videoAtual = (videoAtual + 1) % listaDeVideos.length;
-        player.src = URL.createObjectURL(listaDeVideos[videoAtual]);
-        player.play();
-    }
-    player.onended = tocarProximo;
-
-    // BUSCA MISTA: NOTÍCIAS ES + UNIMED VITÓRIA
-    async function buscarNoticiasMistas() {
-        const avisosUnimed = [
-            "[UNIMED] PRECISE DE MÉDICO AGORA? USE A TELECONSULTA PELO APP UNIMED VITÓRIA.",
-            "[UNIMED] VACINAÇÃO EM DIA É PROTEÇÃO PARA OS PEQUENOS. VISITE NOSSA UNIDADE.",
-            "[UNIMED] UNIMED VITÓRIA: ELEITA PELA 30ª VEZ A MARCA MAIS LEMBRADA PELOS CAPIXABAS.",
-            "[UNIMED] CUIDAR DE VOCÊ, ESSE É O PLANO."
-        ];
-
-        try {
-            const response = await fetch('https://newsdata.io/api/1/news?apikey=pub_3675276e5d8a866166e578c7c90861618a8b&q=espirito%20santo%20OR%20vitoria&country=br&language=pt');
-            const data = await response.json();
-            
-            let newsFinal = "";
-            if (data.results && data.results.length > 0) {
-                // Intercala uma notícia do ES com um aviso da Unimed
-                data.results.slice(0, 8).forEach((n, index) => {
-                    newsFinal += `[ES] ${n.title.toUpperCase()} ••• `;
-                    if (index < avisosUnimed.length) {
-                        newsFinal += `${avisosUnimed[index]} ••• `;
-                    }
-                });
-            } else {
-                newsFinal = avisosUnimed.join(" ••• ");
-            }
-            document.getElementById('news-bar').innerText = newsFinal;
-        } catch (e) {
-            document.getElementById('news-bar').innerText = avisosUnimed.join(" ••• ");
-        }
-    }
-
-    async function atualizarClima() {
-        try {
-            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-20.3155&longitude=-40.3128&current_weather=true');
-            const data = await res.json();
-            document.getElementById('temp-display').innerText = Math.round(data.current_weather.temperature) + "°C";
-            const code = data.current_weather.weathercode;
-            let icon = "☀️";
-            if (code >= 1 && code <= 3) icon = "☁️";
-            if (code >= 51) icon = "🌧️";
-            document.getElementById('clima-icone').innerText = icon;
-        } catch (e) {}
-    }
-
-    const ads = [
-        {t: "Giro de Notícias", d: "As manchetes da Folha Vitória e jornais do ES no seu painel."},
-        {t: "Unimed Vitória", d: "Sempre perto de você com a melhor rede de atendimento do estado."},
-        {t: "Dica de Saúde", d: "Beber água e se alimentar bem ajuda as crianças a crescerem fortes!"}
-    ];
-    let adIdx = 0;
-    function girarAds() {
-        const t = document.getElementById('titulo-ad'), d = document.getElementById('desc-ad');
-        t.style.opacity = 0; d.style.opacity = 0;
-        setTimeout(() => {
-            t.innerText = ads[adIdx].t;
-            d.innerText = ads[adIdx].d;
-            t.style.opacity = 1; d.style.opacity = 1;
-            adIdx = (adIdx + 1) % ads.length;
-        }, 500);
-    }
-
-    async function atualizarFinanceiro() {
-        try {
-            const response = await fetch('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL');
-            const data = await response.json();
-            document.getElementById('usd').innerText = "R$ " + parseFloat(data.USDBRL.bid).toFixed(2);
-            document.getElementById('eur').innerText = "R$ " + parseFloat(data.EURBRL.bid).toFixed(2);
-            document.getElementById('btc').innerText = "R$ " + (parseFloat(data.BTCBRL.bid) / 1000).toFixed(1) + "k";
-        } catch (e) {}
-    }
-
-    setInterval(() => {
-        const agora = new Date();
-        document.getElementById('txt-hora').innerText = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
-        document.getElementById('txt-data').innerText = agora.toLocaleDateString('pt-BR');
-    }, 1000);
-
-    window.onload = () => {
-        atualizarClima();
-        atualizarFinanceiro();
-        buscarNoticiasMistas();
-        setInterval(girarAds, 6000);
-        setInterval(buscarNoticiasMistas, 1200000); // Atualiza tudo a cada 20 min
-        setInterval(atualizarClima, 900000);
+    let banco = JSON.parse(localStorage.getItem('listaMercado_vFinal_Full')) || {
+        listaMarido: { pendentes: [], carrinho: [], total: 0 },
+        listaEsposa: { pendentes: [], carrinho: [], total: 0 },
+        listaFilho: { pendentes: [], carrinho: [], total: 0 },
+        historico: []
     };
+    let listaAtiva = 'Marido';
+    let itemSelecionado = null;
+
+    function salvar() { localStorage.setItem('listaMercado_vFinal_Full', JSON.stringify(banco)); }
+    function mostrarEscolha() {
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-escolha').style.display = 'flex';
+    }
+    function abrirLista(user) {
+        listaAtiva = user;
+        document.getElementById('titulo-lista').innerText = "LISTA DO(A) " + user.toUpperCase();
+        document.getElementById('tela-escolha').style.display = 'none';
+        document.getElementById('app-principal').style.display = 'block';
+        document.getElementById('footer-app').style.display = 'flex';
+        render();
+    }
+    function voltarInicio() { location.reload(); }
+
+    function addItem(cat) {
+        const nome = document.getElementById('inputNome').value;
+        if(!nome) return;
+        banco["lista"+listaAtiva].pendentes.push({ id: Date.now(), nome, cat });
+        document.getElementById('inputNome').value = "";
+        render(); salvar();
+    }
+
+    function abrirModal(id) {
+        itemSelecionado = banco["lista"+listaAtiva].pendentes.find(i => i.id === id);
+        document.getElementById('m-nome').innerText = itemSelecionado.nome;
+        document.getElementById('m-qtd').value = ""; 
+        document.getElementById('m-preco').value = ""; 
+        document.getElementById('overlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('m-preco').focus(), 150);
+    }
+
+    function fecharModal() { document.getElementById('overlay').style.display = 'none'; }
+
+    function confirmarPeguei() {
+        let qVal = document.getElementById('m-qtd').value;
+        if (qVal === "" || qVal <= 0) qVal = "1";
+        const pVal = document.getElementById('m-preco').value;
+        if(!pVal) { alert("Informe o Preço!"); return; }
+        const sub = parseFloat(qVal) * parseFloat(pVal);
+        const L = banco["lista"+listaAtiva];
+        L.carrinho.unshift({ ...itemSelecionado, qtd: qVal, subtotal: sub });
+        L.total += sub;
+        L.pendentes = L.pendentes.filter(i => i.id !== itemSelecionado.id);
+        fecharModal(); render(); salvar();
+    }
+
+    function render() {
+        const L = banco["lista"+listaAtiva];
+        const termoBusca = document.getElementById('searchItem').value.toLowerCase();
+        const dPend = document.getElementById('lista-pendentes');
+        const dCart = document.getElementById('lista-carrinho');
+        dPend.innerHTML = ""; dCart.innerHTML = "";
+
+        const categorias = [...new Set(L.pendentes.map(i => i.cat))].sort();
+        
+        categorias.forEach(cat => {
+            const itensDaCat = L.pendentes.filter(i => i.cat === cat && i.nome.toLowerCase().includes(termoBusca));
+            if(itensDaCat.length > 0) {
+                dPend.innerHTML += `<div class="header-categoria">${cat}</div>`;
+                itensDaCat.forEach(i => {
+                    dPend.innerHTML += `<div class="item">
+                        <span style="text-align:left">${i.nome}</span>
+                        <div><button class="btn-check" onclick="abrirModal(${i.id})">PEGUEI</button>
+                        <button onclick="removerPendente(${i.id})" style="background:none; border:none; margin-left:10px">🗑️</button></div>
+                    </div>`;
+                });
+            }
+        });
+
+        L.carrinho.forEach((i, idx) => {
+            if(i.nome.toLowerCase().includes(termoBusca)) {
+                dCart.innerHTML += `<div class="item item-carrinho">
+                    <div style="text-align:left"><strong>${i.qtd}x</strong> ${i.nome} <small style="display:block; opacity:0.5">${i.cat}</small></div>
+                    <div style="text-align:right">
+                        <div style="font-weight:900">R$ ${i.subtotal.toFixed(2)}</div>
+                        <button onclick="devolver(${idx})" style="background:none; border:none; color:var(--warning); font-size:0.75rem; font-weight:bold;">Volta</button>
+                    </div>
+                </div>`;
+            }
+        });
+        document.getElementById('v-total').innerText = `R$ ${L.total.toFixed(2)}`;
+    }
+
+    function removerPendente(id) {
+        banco["lista"+listaAtiva].pendentes = banco["lista"+listaAtiva].pendentes.filter(i => i.id !== id);
+        render(); salvar();
+    }
+
+    function devolver(idx) {
+        const L = banco["lista"+listaAtiva];
+        L.total -= L.carrinho[idx].subtotal;
+        L.pendentes.push({ id: L.carrinho[idx].id, nome: L.carrinho[idx].nome, cat: L.carrinho[idx].cat });
+        L.carrinho.splice(idx, 1);
+        render(); salvar();
+    }
+
+    function finalizarCompra() {
+        const L = banco["lista"+listaAtiva];
+        if(!L.carrinho.length) return;
+        const agora = new Date();
+        banco.historico.unshift({
+            data: agora.toLocaleString('pt-BR'),
+            mesAno: agora.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
+            total: L.total,
+            usuario: listaAtiva
+        });
+        banco["lista"+listaAtiva] = { pendentes: [], carrinho: [], total: 0 };
+        salvar();
+        alert("Salvo no Histórico!");
+        voltarInicio();
+    }
+
+    function mostrarHistorico() {
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-historico').style.display = 'flex';
+        const gastosMes = {};
+        banco.historico.forEach(h => {
+            gastosMes[h.mesAno] = (gastosMes[h.mesAno] || 0) + h.total;
+        });
+        const painel = document.getElementById('painel-mensal');
+        painel.innerHTML = '<h3 style="margin-top:0; font-size:0.9rem">RESUMO MENSAL</h3>';
+        for (const [mes, valor] of Object.entries(gastosMes)) {
+            painel.innerHTML += `<div class="mes-item"><span style="text-transform: capitalize;">${mes}</span><span style="font-weight:900; color:var(--accent)">R$ ${valor.toFixed(2)}</span></div>`;
+        }
+        const cont = document.getElementById('cont-hist');
+        cont.innerHTML = banco.historico.length ? '<h3 style="font-size:0.8rem; margin: 20px 0 10px; opacity:0.6">COMPRAS FINALIZADAS</h3>' : "Histórico vazio.";
+        banco.historico.forEach(h => {
+            cont.innerHTML += `<div class="hist-card">
+                <div style="font-size:0.7rem; opacity:0.6">${h.data} - ${h.usuario}</div>
+                <div style="font-size:1.1rem; font-weight:900; color:var(--primary)">R$ ${h.total.toFixed(2)}</div>
+            </div>`;
+        });
+    }
+
+    function compartilharZap() {
+        if (banco.historico.length === 0) { alert("Histórico vazio!"); return; }
+        let msg = "*RESUMO DE GASTOS - LISTA DE MERCADO*\n\n";
+        const gastosMes = {};
+        banco.historico.forEach(h => {
+            gastosMes[h.mesAno] = (gastosMes[h.mesAno] || 0) + h.total;
+        });
+        for (const [mes, valor] of Object.entries(gastosMes)) {
+            msg += `*${mes}:* R$ ${valor.toFixed(2)}\n`;
+        }
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+    }
+
+    function limparListaAtiva() {
+        if(confirm("Deseja limpar todos os itens desta lista?")) {
+            banco["lista"+listaAtiva] = { pendentes: [], carrinho: [], total: 0 };
+            salvar(); render();
+        }
+    }
+
+    function zerarGastosMensais() {
+        if(confirm("Deseja apagar TODO o histórico de gastos do ano?")) {
+            banco.historico = [];
+            salvar(); mostrarHistorico();
+        }
+    }
 </script>
 </body>
 </html>
